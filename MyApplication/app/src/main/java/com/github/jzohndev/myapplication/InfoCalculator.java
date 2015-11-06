@@ -23,54 +23,46 @@ public class InfoCalculator extends AppCompatActivity {
     TextView textView;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_calculator);
-        editText =(EditText) findViewById(R.id.editText);
-        textView =(TextView) findViewById(R.id.textView);
-        textView.setVisibility(View.GONE);
+        editText = (EditText) findViewById(R.id.editText);
+        textView = (TextView) findViewById(R.id.textView);
     }
 
-    public void writeMessage(View view) throws IOException {
-        String message = editText.getText().toString();
-        File fileName = new File(getFilesDir(),"text");
-
-
-
-
-        FileOutputStream fos = new FileOutputStream(fileName);
-        OutputStreamWriter writer = new OutputStreamWriter(fos);
-        BufferedWriter br = new BufferedWriter(writer);
-        br.write(message);
-        writer.close();
-        fos.close();
-
-
-
-
-
-        Toast.makeText(getApplicationContext(), "Message Saved", Toast.LENGTH_LONG).show();
-        editText.setText("");
-    }
-
-    public void readMessage(View view) throws IOException {
-        String message;
-        File fileName = new File(getFilesDir(),"text");
-
-        FileInputStream fileInput = new FileInputStream(fileName);
-        InputStreamReader inputStream = new InputStreamReader(fileInput);
-
-        BufferedReader bufferedReader = new BufferedReader(inputStream);
-        StringBuilder stringBuffer = new StringBuilder();
-        while ((message = bufferedReader.readLine()) != null);
-        {
-            stringBuffer.append(message + "\n");
+    public void read(View view) {
+        try {
+            FileInputStream fileInputStream = openFileInput("myText.txt");
+            InputStreamReader inputStreamReader = new InputStreamReader((fileInputStream));
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuffer stringBuffer = new StringBuffer();
+            String lines;
+            while ((lines = bufferedReader.readLine()) != null) {
+                stringBuffer.append(lines + "\n");
+            }
+            textView.setText(stringBuffer.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        textView.setText(stringBuffer);
-        textView.setVisibility(View.VISIBLE);
 
+    }
+
+    public void write(View view) {
+        String myTextMessage = editText.getText().toString();
+        try {
+            FileOutputStream fileOutputStream = openFileOutput("myText.txt", MODE_PRIVATE);
+            fileOutputStream.write(myTextMessage.getBytes());
+            fileOutputStream.close();
+            Toast.makeText(getApplicationContext(), "Text saved", Toast.LENGTH_LONG).show();
+            editText.setText("");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }
